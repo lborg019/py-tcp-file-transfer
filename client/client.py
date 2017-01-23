@@ -38,7 +38,10 @@ while 1:
   # split string to check for meaningful commands
   _check = sentence.split(" ", 1)
 
+  ''''''''''''''''''''''''''''''
   # commands processed locally:
+  ''''''''''''''''''''''''''''''
+
   # user calls !help
   if(sentence=="!help"):
     print ("Available commands:\n"+
@@ -61,7 +64,9 @@ while 1:
   if(sentence=="exit"):
     break
 
-  # commands processed by the server
+  '''''''''''''''''''''''''''''''''
+  commands processed by the server
+  '''''''''''''''''''''''''''''''''
   # user calls ls-remote
   if(sentence=="ls-remote"):
 
@@ -87,15 +92,26 @@ while 1:
     print("[improper command]")
     continue
   if(_check[1] and (_check[0].lower()=="get" or _check[0].lower()=="put")):
+
     # for put we check that file exists in local directory
-    if(_check[0].lower=="put")
+    if(_check[0]=='put'):
+      for f in files:
+        if(f == _check[1]):
+          print("File found, sending request to server...")
+          clientSocket.sendto(sentence.encode(),(serverName, serverPort))
+          modifiedSentence = clientSocket.recv(1024)
+          print(modifiedSentence)
+          break
+        else:
+          print("File not found in local dir")
+          break
 
 
     # for get we send the string and wait for server's response
 
-    clientSocket.sendto(sentence.encode(),(serverName, serverPort))
-    modifiedSentence = clientSocket.recv(1024)
-    print(modifiedSentence)
+    #clientSocket.sendto(sentence.encode(),(serverName, serverPort))
+    #modifiedSentence = clientSocket.recv(1024)
+    #print(modifiedSentence)
   else:
     print("[improper command]")
 

@@ -53,6 +53,8 @@ def clientthread(conn):
         else:
             print(data)
             reply = 'OK...' + data
+            conn.sendall(reply)
+
         if not data: 
             break
         # conn.sendall(reply)
