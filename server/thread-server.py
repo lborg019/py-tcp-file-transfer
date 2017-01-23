@@ -31,7 +31,7 @@ print 'Socket now listening'
 #Function for handling connections. This will be used to create threads
 def clientthread(conn):
     #Sending message to connected client
-    conn.send('Connected, type !help for command list:\n') #send only takes string
+    # conn.send('Connected, type !help for command list:\n') #send only takes string
      
     #infinite loop so that function do not terminate and thread do not end.
     while True:
@@ -49,7 +49,7 @@ def clientthread(conn):
             files = [f for f in os.listdir('.') if os.path.isfile(f)]
             for f in files:
                 remoteList += ("\n-> "+f)
-            conn.sendall(remoteList+"\n")
+            conn.sendall(remoteList)
         else:
             print(data)
             reply = 'OK...' + data
