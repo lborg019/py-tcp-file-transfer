@@ -11,6 +11,7 @@ Use the better name for this module:   MakeUpperCaseServerUsingTCP
 
 from socket import *
 import os
+import select
 
 _help = "help"
 _lsremote = "ls-remote"
@@ -32,15 +33,16 @@ serverSocket = socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(("",serverPort))
 
 # server begins listening for incoming TCP requests
-serverSocket.listen(1)
+serverSocket.listen(5)
 
 # output to console that server is listening 
 print ("The Make Upper Case Server running over TCP is ready to receive ... ")
 
 # server waits for incoming requests; new socket created on return
 connectionSocket, addr = serverSocket.accept()
+print(addr)
 
-while 1:     
+while 1:
     # read a sentence of bytes from socket sent by the client
     sentence = connectionSocket.recv(1024)
 
@@ -51,14 +53,11 @@ while 1:
     if sentence == _help.lower():
       print ("received help");
     elif sentence == _lsremote.lower():
-      print("remote files:")
+      # concatenate file list in string and send:
       for f in files:
         remoteList += ("\n"+f)
-        # fileList.append(f)
-        # print(f)
       connectionSocket.send(remoteList)
-      print ("received ls-remote");
-    elif sentence == _get.lower():
+    elif sentence == _get:
       print ("received a get");
     else:
       print ("received some bs command");

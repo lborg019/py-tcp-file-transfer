@@ -46,6 +46,9 @@ while 1:
     for f in files:
       print(f)
 
+  if(sentence=="exit"):
+    break
+
   # send the user's line over the TCP connection
   # No need to specify server name, port
   # sentence casted to bytes for Python 3  Amer 4-2013
