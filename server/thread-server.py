@@ -38,17 +38,16 @@ def clientthread(conn):
          
         #Receiving from client
         data = conn.recv(1024)
-        # telnet sends dirty strings, clean before checking
-        # cleanData = re.sub('\W+','', data)
-        # if(cleanData == _lsremote):
-        if _lsremote in data: # list server's directory
-            t = data.isalnum() # proof telnet sends dirty strings
-            print(t)
+
+        # telnet sends dirty strings, t = data.isalnum() to check. clean if using telnet
+
+        if (data == _lsremote):
             print("User: "+addr[0]+" "+str(addr[1])+" requested ls-remote")
             remoteList = "remote files:"
             files = [f for f in os.listdir('.') if os.path.isfile(f)]
             for f in files:
-                remoteList += ("\n-> "+f)
+                fileSize = os.path.getsize(f)
+                remoteList += ("\n-> "+f+"\t%d bytes" % fileSize)
             conn.sendall(remoteList)
         else:
             print(data)

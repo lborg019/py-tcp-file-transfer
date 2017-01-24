@@ -38,10 +38,9 @@ while 1:
   # split string to check for meaningful commands
   _check = sentence.split(" ", 1)
 
-  ''''''''''''''''''''''''''''''
-  # commands processed locally:
-  ''''''''''''''''''''''''''''''
-
+  '''''''''''''''''''''''''''''''''
+  commands processed locally:
+  '''''''''''''''''''''''''''''''''
   # user calls !help
   if(sentence=="!help"):
     print ("Available commands:\n"+
@@ -57,7 +56,8 @@ while 1:
   if(sentence=="ls-local"):
     print("local files:")
     for f in files:
-      print("-> "+f)
+      fileSize = os.path.getsize(f)
+      print("-> "+f+"\t%d bytes" % fileSize)
     continue
 
   # user calls exit
@@ -89,11 +89,12 @@ while 1:
     print(modifiedSentence)
     continue
   if(len(_check)!= 2):
-    print("[improper command]")
+    print("[invalid command]")
     continue
   if(_check[1] and (_check[0].lower()=="get" or _check[0].lower()=="put")):
 
-    # for put we check that file exists in local directory
+    #----PUT----#
+    # for PUT we check that file exists in local directory
     if(_check[0]=='put'):
       for f in files:
         if(f == _check[1]):
@@ -106,14 +107,18 @@ while 1:
           print("File not found in local dir")
           break
 
-
-    # for get we send the string and wait for server's response
+    #----GET----#
+    # for GET we send the string and wait for server's response
+    elif(_check[0]=='get'):
+      clientSocket.sendto(sentence.encode(),(serverName, serverPort))
+      modifiedSentence = clientSocket.recv(1024)
+      print(modifiedSentence)
 
     #clientSocket.sendto(sentence.encode(),(serverName, serverPort))
     #modifiedSentence = clientSocket.recv(1024)
     #print(modifiedSentence)
   else:
-    print("[improper command]")
+    print("[invalid command]")
 
 # close the TCP connection
 clientSocket.close()
