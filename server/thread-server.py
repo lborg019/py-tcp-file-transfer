@@ -6,8 +6,9 @@ import re
 from thread import *
 
 path = ("./")
-fileList = []
+# fileList = []
 _lsremote = "ls-remote"
+files = [f for f in os.listdir('.') if os.path.isfile(f)]
  
 HOST = ''   # Symbolic name meaning all available interfaces
 PORT = 8888 # Arbitrary non-privileged port
@@ -41,14 +42,39 @@ def clientthread(conn):
 
         # telnet sends dirty strings, t = data.isalnum() to check. clean if using telnet
 
-        if (data == _lsremote):
+        # we split data at the first white space. first word is opcode, second is file
+        _data = data.split(" ", 1)
+
+        #----ls-remote----#
+        if(data == _lsremote):
             print('User: '+addr[0]+':'+str(addr[1])+' requested ls-remote')
-            remoteList = "remote files:"
-            files = [f for f in os.listdir('.') if os.path.isfile(f)]
+            remoteList = 'remote files:'
             for f in files:
                 fileSize = os.path.getsize(f)
                 remoteList += ("\n-> "+f+"\t%d bytes" % fileSize)
             conn.sendall(remoteList)
+
+        #----GET----#
+        elif(_data[0] == 'get'):
+            _found = False
+            print('User: '+addr[0]+':'+str(addr[1])+' requested a GET for: %s' % _data[1])
+            for f in files:
+                if(f == _data[1]): # if file requested if found
+                    _found = True
+                    print('File found. Sending file size to user:')
+                    # send file size, read file bytes into a buffer, send buffer
+                    reply = 'File found, preparing to download...'
+                    conn.sendall(reply)
+
+            #--- file requested not found ---#
+            if(_found == False):
+                print('File requested not available in dir.')
+                reply = 'File not found.'
+                conn.sendall(reply)
+
+            #reply = 'OK...' + data
+            #conn.sendall(reply)
+            #break
         else:
             print(data)
             reply = 'OK...' + data
