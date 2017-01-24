@@ -42,7 +42,7 @@ def clientthread(conn):
         # telnet sends dirty strings, t = data.isalnum() to check. clean if using telnet
 
         if (data == _lsremote):
-            print("User: "+addr[0]+" "+str(addr[1])+" requested ls-remote")
+            print('User: '+addr[0]+':'+str(addr[1])+' requested ls-remote')
             remoteList = "remote files:"
             files = [f for f in os.listdir('.') if os.path.isfile(f)]
             for f in files:
@@ -59,6 +59,7 @@ def clientthread(conn):
         # conn.sendall(reply)
      
     #came out of loop
+    print 'User: '+addr[0]+':'+str(addr[1])+' disconnected'
     conn.close()
  
 #now keep talking with the client
