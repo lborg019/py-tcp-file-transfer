@@ -112,7 +112,54 @@ while 1:
     elif(_check[0]=='get'):
       clientSocket.sendto(sentence.encode(),(serverName, serverPort))
       modifiedSentence = clientSocket.recv(1024)
-      print(modifiedSentence)
+
+      # check server's response
+      if(modifiedSentence == 'True'): # file found
+        print('File found, preparing download...')
+
+        # receive file size
+        reqFileSize = clientSocket.recv(1024)
+        print("file size: "+reqFileSize)
+
+        # send file size ACK to server
+        fSizeACK = str(reqFileSize)
+        clientSocket.sendto(fSizeACK.encode(),(serverName, serverPort))
+
+        # receive file in slices of 1024 bytes
+        # open a file in write byte mode:
+        f = open((path+_check[1]), "wb") # write bytes flag is passed
+        buffWrote = 0
+        bytesRemaining = int(reqFileSize)
+
+        while bytesRemaining != 0:
+          if(bytesRemaining >= 1024): # slab >= than 1024 buffer
+            # receive slab from server
+            slab = clientSocket.recv(1024)
+            sizeofSlabReceived = len(slab)
+            print(len(slab))
+            bytesRemaining = bytesRemaining - int(sizeofSlabReceived)
+          else:
+            # receive slab from server
+            slab = clientSocket.recv(1024)
+            sizeofSlabReceived = len(slab)
+            print(len(slab))
+            bytesRemaining = bytesRemaining - int(sizeofSlabReceived)
+
+            '''
+            sizeofSlab = len(slab)
+            f.write(slab)
+            bytesRemaining = bytesRemaining - int(sizeofSlab)
+          else:
+            # receive slab from server
+            slab = clientSocket.recv(1024)
+            sizeofSlab = len(slab)
+            '''
+
+
+
+      elif(modifiedSentence == 'False'): # file not found
+        print(modifiedSentence)
+        print('File requested not available in remote dir.')
 
     #clientSocket.sendto(sentence.encode(),(serverName, serverPort))
     #modifiedSentence = clientSocket.recv(1024)

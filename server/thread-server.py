@@ -3,6 +3,7 @@ import sys
 import os
 import select
 import re
+import time
 from thread import *
 
 path = ("./")
@@ -56,20 +57,55 @@ def clientthread(conn):
 
         #----GET----#
         elif(_data[0] == 'get'):
-            _found = False
+            _found = False # flag in case file is not found
             print('User: '+addr[0]+':'+str(addr[1])+' requested a GET for: %s' % _data[1])
             for f in files:
-                if(f == _data[1]): # if file requested if found
+                #--- file requested found ---#
+                if(f == _data[1]):
                     _found = True
                     print('File found. Sending file size to user:')
-                    # send file size, read file bytes into a buffer, send buffer
-                    reply = 'File found, preparing to download...'
+                    # send 'found' flag to user
+                    reply = str(_found)
                     conn.sendall(reply)
+                    # get file size and send it to user
+                    reqFileSize = os.path.getsize(f)
+                    conn.sendall(str(reqFileSize))
+
+                    # receive user file size ACK
+                    fSizeACK = conn.recv(1024)
+                    print("ACK: "+fSizeACK)
+
+                    print('Preparing upload...')
+
+                    # send file in slices of 1024 bytes:
+                    # open file in read byte mode:
+                    f = open((path+f), "rb") # read bytes flag is passed
+                    buffRead = 0
+                    bytesRemaining = int(reqFileSize)     
+
+                    while bytesRemaining != 0:
+                        if(bytesRemaining >= 1024): # slab >= than 1024 buffer
+                            buffRead = f.read(1024)
+                            sizeofSlabRead = len(buffRead)
+                            print('remaining: %d' % bytesRemaining)
+                            print('read: %d'%sizeofSlabRead)
+                            # send slab to client:
+                            # todo
+                            bytesRemaining = bytesRemaining - int(sizeofSlabRead)
+                        else: # slab smaller than 1024 buffer
+                            buffRead = f.read(bytesRemaining) # read 1024 bytes at a time
+                            sizeofSlabRead = len(buffRead)
+                            print('remaining: %d' % bytesRemaining)
+                            print('read: %d'%sizeofSlabRead)
+                            # send slab to client:
+                            # todo
+                            bytesRemaining = bytesRemaining - int(sizeofSlabRead)
+                    print("Read the file completely")
 
             #--- file requested not found ---#
             if(_found == False):
                 print('File requested not available in dir.')
-                reply = 'File not found.'
+                reply = str(_found)
                 conn.sendall(reply)
 
             #reply = 'OK...' + data
