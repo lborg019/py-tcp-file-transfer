@@ -135,14 +135,17 @@ while 1:
           if(bytesRemaining >= 1024): # slab >= than 1024 buffer
             # receive slab from server
             slab = clientSocket.recv(1024)
+            f.write(slab)
             sizeofSlabReceived = len(slab)
-            print(len(slab))
+            print("wrote %d bytes" % len(slab))
+
             bytesRemaining = bytesRemaining - int(sizeofSlabReceived)
           else:
             # receive slab from server
-            slab = clientSocket.recv(1024)
+            slab = clientSocket.recv(bytesRemaining) # or 1024
+            f.write(slab)
             sizeofSlabReceived = len(slab)
-            print(len(slab))
+            print("wrote %d bytes" % len(slab))
             bytesRemaining = bytesRemaining - int(sizeofSlabReceived)
 
             '''

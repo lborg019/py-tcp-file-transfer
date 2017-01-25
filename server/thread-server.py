@@ -90,7 +90,7 @@ def clientthread(conn):
                             print('remaining: %d' % bytesRemaining)
                             print('read: %d'%sizeofSlabRead)
                             # send slab to client:
-                            # todo
+                            conn.sendall(buffRead)
                             bytesRemaining = bytesRemaining - int(sizeofSlabRead)
                         else: # slab smaller than 1024 buffer
                             buffRead = f.read(bytesRemaining) # read 1024 bytes at a time
@@ -98,7 +98,8 @@ def clientthread(conn):
                             print('remaining: %d' % bytesRemaining)
                             print('read: %d'%sizeofSlabRead)
                             # send slab to client:
-                            # todo
+                            conn.sendall(buffRead)
+
                             bytesRemaining = bytesRemaining - int(sizeofSlabRead)
                     print("Read the file completely")
 
