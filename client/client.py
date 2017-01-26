@@ -36,9 +36,7 @@ while 1:
   # split string to check for meaningful commands
   _check = sentence.split(" ", 1)
 
-  '''''''''''''''''''''''''''
-  commands processed locally:
-  '''''''''''''''''''''''''''
+  #-------------------commands processed locally:
   # user calls !help
   if(sentence=="!help"):
     print ("Available commands:\n"+
@@ -66,9 +64,7 @@ while 1:
     modifiedSentence = clientSocket.recv(1024)
     print(modifiedSentence)
 
-    '''''''''''''''''''''''''''
-    commands processed remotely:
-    '''''''''''''''''''''''''''
+  #-------------------commands processed remotely:
   elif(len(_check)==2):
     if(_check[0].lower()=="get" or _check[0].lower()=="put"):
       #----PUT----#
@@ -116,6 +112,7 @@ while 1:
               f.write(slab)
               sizeofSlabReceived = len(slab)
               print("wrote %d bytes" % len(slab))
+
               bytesRemaining = bytesRemaining - int(sizeofSlabReceived)
             else:
               # receive slab from server
@@ -128,6 +125,10 @@ while 1:
         elif(modifiedSentence == 'False'): # file not found
           print(modifiedSentence)
           print('File requested not available in remote dir.')
+
+      #clientSocket.sendto(sentence.encode(),(serverName, serverPort))
+      #modifiedSentence = clientSocket.recv(1024)
+      #print(modifiedSentence)
     else:
       # multiple invalid strings
       print("[invalid command]")
