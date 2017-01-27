@@ -49,6 +49,8 @@ while 1:
 
   # user calls ls-local
   elif(sentence=="ls-local"):
+    # seek from scratch
+    files = [f for f in os.listdir('.') if os.path.isfile(f)]
     print("local files:")
     for f in files:
       fileSize = os.path.getsize(f)
