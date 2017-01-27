@@ -48,12 +48,55 @@ def clientthread(conn):
 
         #----ls-remote----#
         if(data == _lsremote):
+            # refresh file list
+            files = [f for f in os.listdir('.') if os.path.isfile(f)]
             print('User: '+addr[0]+':'+str(addr[1])+' requested ls-remote')
             remoteList = 'remote files:'
             for f in files:
                 fileSize = os.path.getsize(f)
                 remoteList += ("\n-> "+f+"\t%d bytes" % fileSize)
             conn.sendall(remoteList)
+
+        #----PUT----#
+        elif(_data[0] == 'put'):
+            # catch file name
+            reqFileName = _data[1]
+            print('User: '+addr[0]+':'+str(addr[1])+' requested a PUT for: %s' % reqFileName)
+
+            # send back the file name as ACK
+            conn.sendall(str(reqFileName))
+
+            #receive file size
+            reqFileSize = conn.recv(1024)
+            print('PUT file size: '+reqFileSize+' bytes')
+
+            # send back the file size as ACK
+            conn.sendall(reqFileSize)
+
+            # receive file
+
+            # send file in slices of 1024 bytes:
+            # open file in read byte mode:
+            f = open((path+reqFileName), "wb") # write bytes flag is passed
+            buffRead = 0
+            bytesRemaining = int(reqFileSize)
+            while bytesRemaining != 0:
+                if(bytesRemaining >= 1024): # slab >= than 1024 buffer
+                    # receive slab from client
+                    slab = conn.recv(1024)
+                    f.write(slab)
+                    sizeofSlabReceived = len(slab)
+                    print("wrote %d bytes" % len(slab))
+
+                    bytesRemaining = bytesRemaining - int(sizeofSlabReceived)
+                else:
+                    #receive slab from server
+                    slab = conn.recv(bytesRemaining) # of 1024
+                    f.write(slab)
+                    sizeofSlabReceived = len(slab)
+                    print("wrote %d bytes" % len(slab))
+                    bytesRemaining = bytesRemaining - int(sizeofSlabReceived)
+            print("File uploaded completely")
 
         #----GET----#
         elif(_data[0] == 'get'):
@@ -99,7 +142,6 @@ def clientthread(conn):
                             print('read: %d'%sizeofSlabRead)
                             # send slab to client:
                             conn.sendall(buffRead)
-
                             bytesRemaining = bytesRemaining - int(sizeofSlabRead)
                     print("Read the file completely")
 

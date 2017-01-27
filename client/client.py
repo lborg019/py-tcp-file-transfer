@@ -49,7 +49,7 @@ while 1:
 
   # user calls ls-local
   elif(sentence=="ls-local"):
-    # seek from scratch
+    # refresh file list
     files = [f for f in os.listdir('.') if os.path.isfile(f)]
     print("local files:")
     for f in files:
@@ -70,18 +70,65 @@ while 1:
   elif(len(_check)==2):
     if(_check[0].lower()=="get" or _check[0].lower()=="put"):
       #----PUT----#
+      '''
+       send file
+       (wait) receive ACK signaling that server caught the file
+
+       upload complete
+      '''
       # for PUT we check that file exists in local directory
       if(_check[0]=='put'):
+        _found = False # flag in case not found
+        # refresh file list
+        files = [f for f in os.listdir('.') if os.path.isfile(f)]
         for f in files:
           if(f == _check[1]):
+            _found = True
             print("File found, sending request to server...")
+            # send PUT 'filename to server'
             clientSocket.sendto(sentence.encode(),(serverName, serverPort))
+
+            # receive ACK signaling that server caught file name
             modifiedSentence = clientSocket.recv(1024)
-            print(modifiedSentence)
-            break
-          else:
-            print("File not found in local dir")
-            break
+            print("ACK: "+modifiedSentence)
+
+            # send file size to the server
+            fileSize = os.path.getsize(f)
+            clientSocket.sendto(str(fileSize).encode(),(serverName, serverPort))
+
+            # receive ACK signaling that server caught file size
+            modifiedSentence = clientSocket.recv(1024)
+            print("ACK2 :"+modifiedSentence)
+
+            # send file
+            f = open((path+f), "rb") # read bytes flag is passed
+            buffRead = 0
+            bytesRemaining = int(fileSize)
+
+            while bytesRemaining != 0:
+              if(bytesRemaining >= 1024): # slab >= than 1024 buffer
+                buffRead = f.read(1024)
+                sizeofSlabRead = len(buffRead)
+                print('remaining: %d' % bytesRemaining)
+                print('read: %d'%sizeofSlabRead)
+                # send slab to server:
+                clientSocket.sendto(buffRead,(serverName, serverPort))
+                #conn.sendall(buffRead)
+                bytesRemaining = bytesRemaining - int(sizeofSlabRead)
+              else: # slab smaller than 1024 buffer
+                buffRead = f.read(bytesRemaining) # read 1024 bytes at a time
+                sizeofSlabRead = len(buffRead)
+                print('remaining: %d'%bytesRemaining)
+                print('read: %d'%sizeofSlabRead)
+                # send slab to server
+                clientSocket.sendto(buffRead,(serverName, serverPort))
+                # conn.sendall(buffRead)
+                bytesRemaining = bytesRemaining - int(sizeofSlabRead)
+            print("Read file completely")
+
+        #--- file requested not found ---#
+        if(_found == False):
+          print('File requested not available in dir.')
 
       #----GET----#
       # for GET we send the string and wait for server's response
