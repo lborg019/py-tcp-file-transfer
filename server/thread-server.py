@@ -12,9 +12,9 @@ from thread import *
 # Run command line argument check
 if(len(sys.argv)!=2): # user did not pass port
     print('Usage: [python thread-server.py <portno>]')
-    print('no argument passed for <portno>')
+    print('wrong arguments for <portno>')
     exit()
-else: # and len(argList[1]) == 4):
+else:
     strPortno = str(sys.argv[1])
     if(len(strPortno) == 4 and strPortno.isdigit()):
         print('Command line argument check: OK')
@@ -120,6 +120,7 @@ def clientthread(conn):
         elif(_data[0] == 'get'):
             _found = False # flag in case file is not found
             print('User: '+addr[0]+':'+str(addr[1])+' requested a GET for: %s' % _data[1])
+            files = [f for f in os.listdir('.') if os.path.isfile(f)]
             for f in files:
                 #--- file requested found ---#
                 if(f == _data[1]):
