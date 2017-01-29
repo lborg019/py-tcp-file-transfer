@@ -10,13 +10,32 @@ Use the better name for this module:   MakeUpperCaseClientUsingTCP
 """
 
 from socket import *
+import sys
 import os
+
+# Run command line argument check
+if(len(sys.argv)!=3): # user did not pass port, or, too many args
+    print('Usage: [python thread-server.py <hostname> <portno>]')
+    print('wrong arguments for <hostname> and <portno>')
+    exit()
+else:
+    strPortno = str(sys.argv[2])
+    if(len(strPortno) == 4 and strPortno.isdigit()):
+        print('Command line argument check: OK')
+        # run program, fail connection if necessary
+
+    else:
+        print('Usage: [python thread-server.py <portno>]')
+        print('<portno> must be 4 digit number')
+        exit()
+
 # STUDENTS - replace your server machine's name 
-serverName = "localhost"
+serverName = sys.argv[1]
 
 # STUDENTS - you should randomize your port number.         
 # This port number in practice is often a "Well Known Number"  
-serverPort = 8888
+#serverPort = 8888
+serverPort = int(sys.argv[2])
 
 # create TCP socket on client to use for connecting to remote
 # server.  Indicate the server's remote listening port

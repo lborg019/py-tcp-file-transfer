@@ -6,14 +6,32 @@ import re
 import time
 from thread import *
 
+# print 'Number of arguments:', len(sys.argv), 'arguments.'
+# print 'Argument List:', str(sys.argv)
+
+# Run command line argument check
+if(len(sys.argv)!=2): # user did not pass port
+    print('Usage: [python thread-server.py <portno>]')
+    print('no argument passed for <portno>')
+    exit()
+else: # and len(argList[1]) == 4):
+    strPortno = str(sys.argv[1])
+    if(len(strPortno) == 4 and strPortno.isdigit()):
+        print('Command line argument check: OK')
+        # run program
+    else:
+        print('Usage: [python thread-server.py <portno>]')
+        print('<portno> must be 4 digit number')
+        exit()
+
 path = ("./")
 # fileList = []
 _lsremote = "ls-remote"
 files = [f for f in os.listdir('.') if os.path.isfile(f)]
  
 HOST = ''   # Symbolic name meaning all available interfaces
-PORT = 8888 # Arbitrary non-privileged port
- 
+PORT = int(sys.argv[1]) # Arbitrary non-privileged port
+
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print 'Socket created'
  
@@ -124,7 +142,7 @@ def clientthread(conn):
                     # open file in read byte mode:
                     f = open((path+f), "rb") # read bytes flag is passed
                     buffRead = 0
-                    bytesRemaining = int(reqFileSize)     
+                    bytesRemaining = int(reqFileSize)  
 
                     while bytesRemaining != 0:
                         if(bytesRemaining >= 1024): # slab >= than 1024 buffer
