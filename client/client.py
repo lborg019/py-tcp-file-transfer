@@ -20,7 +20,8 @@ if(len(sys.argv)!=3): # user did not pass port, or, too many args
     exit()
 else:
     strPortno = str(sys.argv[2])
-    if(len(strPortno) == 4 and strPortno.isdigit()):
+    # if(len(strPortno) == 4 and strPortno.isdigit()):
+    if(strPortno.isdigit()):
         print('Command line argument check: OK')
         # run program, fail connection if necessary
 

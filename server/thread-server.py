@@ -16,12 +16,13 @@ if(len(sys.argv)!=2): # user did not pass port
     exit()
 else:
     strPortno = str(sys.argv[1])
-    if(len(strPortno) == 4 and strPortno.isdigit()):
+    # if(len(strPortno) == 4 and strPortno.isdigit()):
+    if(strPortno.isdigit()):
         print('Command line argument check: OK')
         # run program
     else:
         print('Usage: [python thread-server.py <portno>]')
-        print('<portno> must be 4 digit number')
+        # print('<portno> must be 4 digit number')
         exit()
 
 path = ("./")
